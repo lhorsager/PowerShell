@@ -10,6 +10,7 @@ $uriRoot = $env:SYSTEM_TEAMFOUNDATIONSERVERURI
 $ProjectName = $env:SYSTEM_TEAMPROJECT
 $ProjectId = $env:SYSTEM_TEAMPROJECTID 
 $uri = "$uriRoot$ProjectName/_apis/build/definitions?api-version=$apiVersion"
+$buildName = $env:BUILD_DEFINITIONNAME
 
 # Base64-encodes the Personal Access Token (PAT) appropriately
 $base64AuthInfo = [Convert]::ToBase64String([Text.Encoding]::ASCII.GetBytes(("{0}:{1}" -f "", $token)))
@@ -19,7 +20,7 @@ $header = @{Authorization = ("Basic {0}" -f $base64AuthInfo)}
 $buildDefs = Invoke-RestMethod -Uri $uri -Method Get -ContentType "application/json" -Headers $header
  
 # Find the build definition for this project
-$buildDef = $buildDefs.value | Where-Object { $_.Project.id -eq $ProjectId }
+$buildDef = $buildDefs.value | Where-Object { $_.Project.id -eq $ProjectId -and ($_.name -eq $buildName }
 if ($buildDef -eq $null)
 {
     Write-Error "Unable to find a build definition for Project '$ProjectName'. Check the config values and try again." -ErrorAction Stop
